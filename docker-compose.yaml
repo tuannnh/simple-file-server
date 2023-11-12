@@ -1,0 +1,12 @@
+version: "3"  
+services:  
+  
+  # ----------------- #  
+  #    File-server    # 
+  # ----------------- #
+  file-server:  
+    container_name: file-server  
+    build: .  
+    ports:  
+      - "8501:8501"  
+
