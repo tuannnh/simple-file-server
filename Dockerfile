@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Expose port you want your app on
-EXPOSE 8585
+EXPOSE 8501
 
 # Copy app code and set working directory
 COPY . .
@@ -19,4 +19,4 @@ RUN pip install -U pip
 RUN pip install -r requirements.txt
 
 # Run
-ENTRYPOINT ["streamlit", "run", "app.py"]
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]

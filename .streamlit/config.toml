@@ -1,5 +1,6 @@
 [server]
-port = 8585
+port=8501
+enableCORS=false
 
 [theme]
 base="dark"
@@ -8,3 +9,8 @@ backgroundColor="#000000"
 secondaryBackgroundColor="#4267B2"
 textColor="#FFFFFF"
 font="sans serif"
+
+[browser]
+gatherUsageStats=false
+serverAddress="0.0.0.0"
+serverPort=8501
