@@ -1,82 +1,42 @@
 import os
 import streamlit as st
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
-import io
-
-from requests import Request
-
-# If modifying these SCOPES, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+import hmac
 
 
 def authenticate():
-    creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json')
+    """Returns `True` if the user had the correct passcode."""
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+    def passcode_entered():
+        """Checks whether a passcode entered by the user is correct."""
+        if hmac.compare_digest(st.session_state["passcode"], st.secrets["passcode"]):
+            st.session_state["passcode_correct"] = True
+            del st.session_state["passcode"]  # Don't store the passcode.
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES, redirect_uri='urn:ietf:wg:oauth:2.0:oob')
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
+            st.session_state["passcode_correct"] = False
 
-    return creds
+    # Return True if the passcode is validated.
+    if st.session_state.get("passcode_correct", False):
+        return True
 
-
-def upload_file(service, file_path):
-    file_metadata = {'name': os.path.basename(file_path)}
-    print(f"File path: {file_path}")
-    media = MediaFileUpload(file_path, resumable=True)
-    file = service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-    return file['id']
-
-
-def list_files(service):
-    results = service.files().list().execute()
-    files = results.get('files', [])
-    return files
-
-
-def download_file(service, file_id):
-    request = service.files().get_media(fileId=file_id)
-    fh = io.BytesIO()
-    downloader = MediaIoBaseDownload(fh, request)
-
-    done = False
-    while done is False:
-        status, done = downloader.next_chunk()
-
-    return fh.getvalue()
-
+    # Show input for passcode.
+    st.text_input(
+        "Passcode", type="password", on_change=passcode_entered, key="passcode"
+    )
+    if "passcode_correct" in st.session_state:
+        st.error("😕 Passcode incorrect!")
+    return False
 
 def delete_file(filename: str):
     if os.path.exists(filename):
         os.remove(filename)
 
 
-def main():
-    # Set page config
-    st.set_page_config(
-        page_title="Server file upload app",
-        page_icon="💻",
-    )
-
+def load_main_page():
     # Create data folder if not exist
     if not os.path.exists('data'):
         os.makedirs('data')
 
-    st.title("Server File Upload App")
+    st.title("File Server Application")
 
     # File upload section
     st.subheader("Upload file to server")
@@ -111,13 +71,23 @@ def main():
             col3.button('❌', on_click=delete_file, args=[file_path], key=file)
 
     hide_streamlit_style = """
-                <style>
-                #MainMenu {visibility: hidden;}
-                footer {visibility: hidden;}
-                </style>
-                """
+                    <style>
+                    #MainMenu {visibility: hidden;}
+                    footer {visibility: hidden;}
+                    </style>
+                    """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
+def main():
+    # Set page config
+    st.set_page_config(
+        page_title="File Server",
+        page_icon="💻",
+    )
+
+    auth = authenticate()
+    if auth:
+        load_main_page()
 
 if __name__ == "__main__":
     main()
