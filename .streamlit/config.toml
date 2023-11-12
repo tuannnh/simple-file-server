@@ -1,0 +1,10 @@
+[server]
+port = 8585
+
+[theme]
+base="dark"
+primaryColor="#4267B2"
+backgroundColor="#000000"
+secondaryBackgroundColor="#4267B2"
+textColor="#FFFFFF"
+font="sans serif"
