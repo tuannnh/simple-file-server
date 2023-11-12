@@ -42,7 +42,7 @@ To use this application, follow the steps below:
 Run the application using Docker Compose:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 This command will start the application in detached mode, allowing you to use the file server without tying up your terminal.
