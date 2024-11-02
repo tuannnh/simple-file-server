@@ -26,6 +26,7 @@ def authenticate():
         st.error("😕 Passcode incorrect!")
     return False
 
+
 def delete_file(filename: str):
     if os.path.exists(filename):
         os.remove(filename)
@@ -78,6 +79,7 @@ def load_main_page():
                     """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
+
 def main():
     # Set page config
     st.set_page_config(
@@ -85,9 +87,10 @@ def main():
         page_icon="💻",
     )
 
-    auth = authenticate()
-    if auth:
-        load_main_page()
+    # auth = authenticate()
+    # if auth:
+    load_main_page()
+
 
 if __name__ == "__main__":
     main()
