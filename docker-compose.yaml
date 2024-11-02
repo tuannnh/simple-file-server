@@ -1,6 +1,7 @@
 services:
   file-server:
-    container_name: file-server  
+    container_name: file-server
+    image: tuannnh/file-server:latest
     ports:
       - 11127:5000
     volumes:
